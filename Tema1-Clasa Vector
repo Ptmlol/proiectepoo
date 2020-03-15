@@ -1,0 +1,215 @@
+#include "stdafx.h"
+#include <stdio.h>
+#include <iostream>
+
+using namespace std;
+class Vector {
+private:
+	int size;
+	int * arr;
+public:
+	void initialize(int newSize, int element) {//metoda initializare
+		size = newSize;
+		arr = new int[newSize];
+		for (int i = 0; i < newSize; i++)
+			arr[i] = element;
+	}
+	void copy(Vector& copy) {//metoda copiere
+		size = copy.getSize();
+		arr = new int[size];
+		for (int i = 0; i < copy.getSize(); i++)
+			arr[i] = copy.getArr()[i];
+	}
+	void max_poz() {//metoda gasire max si pozitie
+		int max_array = arr[0], poz_max_array=0;
+		for(int i=1;i<size;i++)
+			if (arr[i] > max_array)
+			{
+				max_array = arr[i];
+				poz_max_array = i;
+				}
+		cout <<"Elementul maxim este: "<< max_array << " " <<"\nPozitia elementului maxim este: "<< poz_max_array;
+	}
+	void sortVector() {//metoda sortare vector
+		for (int i = 0; i < size - 1; i++)
+			for (int j = i; j < size; j++)
+				if (arr[i] > arr[j])
+					swap(arr[i], arr[j]);
+	}
+	Vector& operator=(Vector &v) { // egal
+		size = v.getSize();
+		arr = new int[size];
+		for (int i = 0; i < size; i++)
+			this->arr[i] = v.arr[i];
+		return *this;
+	}
+	int sum(){//calcul suma tuturor elementelor
+		int sum = 0;
+		for (int i = 0; i < size; i++)
+			sum += arr[i];
+		return sum;
+	}
+	int getSize() {//getter
+		return size;
+	}
+	void setSize(int newSize) {//setter
+		size = newSize;
+	}
+	int* getArr() {//getter
+		return arr;
+	}
+	Vector(int newSize, int element) {//constructor initializare
+		size = newSize;
+		arr = new int[newSize];
+		for (int i = 0; i < newSize; i++)
+			arr[i] = element;
+	}
+
+	Vector(Vector& copy) {//constructor copiere 
+		size = copy.getSize();
+		arr = new int[size];
+		for (int i = 0; i < copy.getSize(); i++)
+			arr[i] = copy.getArr()[i];
+	} 
+	void citire(istream &input) {
+		cout << "\nDimensiune vector: ";
+		input >> size;
+		cout << "\nIntroduceti elemente: ";
+		for (int i = 0; i < size; i++)
+			input >> arr[i];
+	}
+	friend istream &operator >> (istream &input, Vector &m) {
+		m.citire(input);
+		return input;
+	}
+
+
+	~Vector() {//destruct
+		free(arr);
+	}
+};
+
+void menu_output()
+{
+	cout << "\n Naiboiu Teodor 212 - Proiect - Tema 3 ( Clasa Vector): \n";
+	cout << "\n\t MENIU:";
+	cout << "\n===========================================\n";
+	cout << "\n";
+	cout << "1. Initializare sau reactualizare vector initial(V) cu un numar de elemente pe componente" << "\n";
+	cout << "2. Citire vector initial(V)" << "\n"; 
+	cout << "3. Copiere vector initial(V) in alt vector(V2)" << "\n";
+	cout << "4. Aflarea maximului dintr-un vector la alegere" << "\n";
+	cout << "5. Sortare crescator a unui vector la alegere" << "\n";
+	cout << "6. Suma tuturor elementelor dintr-un vector la alegere" << "\n";
+	cout << "7. Afisare vector initial(V)" << "\n";
+	cout << "8. Afisare vector copiat(V2)." << "\n";
+	cout << "0. Iesire." << "\n";
+}
+void menu()
+{
+	int option;//optiunea aleasa din meniu
+	int a,b;
+	option = 0;
+	Vector v(1, 0);
+	Vector v2 = v;
+	do
+	{
+		menu_output();
+
+		cout << "\nIntroduceti numarul actiunii: ";
+		cin >> option;
+
+		if (option == 1)
+		{
+			cout << "\nIntroduceti numarul de elemente de inserat: ";
+			cin >> a;
+			cout << "\n Introduceti elementul de inserat:";
+			cin >> b;
+			v.initialize(a, b);//initializare/reactualizare vector
+		}
+		if (option == 2)
+		{
+			
+			cin >> v; // citire vector
+		}
+		if (option == 3)
+		{	
+			v2=v;
+		}
+		if (option == 4)
+		{
+			cout << "Tastati 1 pentru vectorul initial(V) sau 2 pentru vectorul copiat(V2)\n";
+			cin >> a;
+			cout << "\nAti selectat optiunea: " << a<<"\n";
+			if (a == 1)
+				v.max_poz();
+			else
+				if (a == 2)
+					v2.max_poz();
+				else
+					cout << "\nOptiune invalida! Optiuni disponibile: 1----2";
+		}
+		if (option == 5)
+		{
+			cout << "Tastati 1 pentru vectorul initial(V) sau 2 pentru vectorul copiat(V2)\n";
+			cin >> a;
+			cout << "\nAti selectat optiunea: " << a << "\n";
+			if (a == 1) {
+				v.sortVector();
+				cout << "\nVectorul initial(V) a fost sortat. Selectati optiunea de afisare a vectorului initial pentru a vedea rezultatul.";
+			}
+			else
+				if (a == 2) {
+					v2.sortVector();
+					cout << "\nVectorul copiat(V2) a fost sortat. Selectati optiunea de afisare a vectorului copiat pentru a vedea rezultatul.";
+				}
+				else
+					cout << "\nOptiune invalida! Optiuni disponibile: 1----2";
+
+		}
+		if (option == 6)
+		{
+			cout << "Tastati 1 pentru vectorul initial(V) sau 2 pentru vectorul copiat(V2)\n";
+			cin >> a;
+			cout << "\nAti selectat optiunea: " << a << "\n";
+			if (a == 1) {
+				cout << "\nSuma elementelor din vectorul initial(V) este: ";
+				cout << v.sum() << endl;
+			}
+			else
+				if (a == 2) {
+					cout << "\nSuma elementelor din vectorul copiat este: ";
+					cout << v2.sum() << endl;
+				}
+				else
+					cout << "\nOptiune invalida! Optiuni disponibile: 1----2";
+			
+		}
+		if (option == 7) {
+			cout << "\nElementele vectorului initial(V) sunt urmatoarele: ";
+			for (int i = 0; i < v.getSize(); i++)
+				cout << v.getArr()[i] << " ";
+		}
+		if (option == 8) {
+			cout << "\nElementele vectorului copiat(V2) sunt urmatoarele: ";
+			for (int i = 0; i < v.getSize(); i++)
+				cout << v2.getArr()[i] << " ";
+		}
+		if (option == 0)
+		{
+			cout << "\nEXIT!\n";
+		}
+		if (option<0 || option>8)
+		{
+			cout << "\nSelectie invalida\n";
+		}
+		cout << "\n";
+		system("pause"); ///Pauza - Press any key to continue...
+		system("cls");   ///Sterge continutul curent al consolei
+	} while (option != 0);
+}
+int main()
+{
+	menu();
+	return 0;
+}
