@@ -1,0 +1,755 @@
+﻿#include <bits/stdc++.h>
+//#include "stdafx.h"
+//#include <iostream>
+//pentru visual enable stdfax.h si iostream
+//pentru codeblocks enable bits/stdc.h
+using namespace std;
+
+
+class Punct {
+	float x, y;
+public:
+
+	Punct(float, float);
+	Punct(const Punct&);
+	Punct& operator=(const Punct&);
+	virtual~Punct(); ///destructor virtual
+	virtual void citire(istream &in);
+	virtual void afisare(ostream &out);
+	friend istream& operator>>(istream&, Punct&);
+	friend ostream& operator<<(ostream&, Punct&);
+	void setx(float);
+	void sety(float);
+	float getx();
+	float gety();
+};
+
+void Punct::setx(float x) {
+	this->x = x;
+}
+void Punct::sety(float y) {
+	this->y = y;
+}
+
+float Punct::getx() {
+	return this->x;
+}
+
+float Punct::gety() {
+	return this->y;
+}
+
+Punct::Punct(float x = 0, float y = 0) {
+	this->x = x;
+	this->y = y;
+}
+
+Punct::Punct(const Punct& p) {
+	this->x = p.x;
+	this->y = p.y;
+}
+
+Punct& Punct::operator=(const Punct& p) {
+	this->x = p.x;
+	this->y = p.y;
+	return *this;
+}
+
+Punct::~Punct() {}
+
+void Punct::citire(istream &in) {
+	cout << "\nDati x:";
+	float x;
+	in >> x;
+	cout << "\nDati y:";
+	float y;
+	in >> y;
+	this->x = x;
+	this->y = y;
+}
+void Punct::afisare(ostream &out) {
+	out << "\nx este:";
+	out << this->x;
+	out << "\ny este:";
+	out << this->y;
+}
+
+istream& operator>>(istream& in, Punct& p) {
+	p.citire(in);
+	return in;
+}
+
+ostream& operator<<(ostream& out, Punct& p) {
+	p.afisare(out);
+	return out;
+}
+
+//////================================================================
+class Patrat {
+protected:
+	Punct stanga_jos;
+	float latura;
+	static int nr; ///Variabila statica - nr figuri
+public:
+	Patrat();
+	Patrat(Punct, float);
+	Patrat(const Patrat&);
+	Patrat& operator=(const Patrat&);
+	~Patrat();
+	virtual void citire(istream &in);
+	virtual void afisare(ostream &out);
+	friend istream& operator>>(istream&, Patrat&);
+	friend ostream& operator<<(ostream&, Patrat&);
+	virtual float arie();
+	virtual float perimetru();
+	bool valid(float);
+	static void nrfiguri() {
+		cout << nr;
+	}
+};
+
+int Patrat::nr; ///Declarare variabila 
+
+bool Patrat::valid(float latura) {
+	if (latura == 0 || latura < 0) {
+		cout << "\nVerificare patrat: Figura nu a fost specificata corect";
+		return 0;
+	}
+	else
+		return 1;
+
+}
+
+Patrat::Patrat() {
+	nr++;
+	stanga_jos.setx(0);
+	stanga_jos.sety(0);
+	latura = 0;
+}
+
+Patrat::Patrat(Punct sj, float latura) {
+	nr++;
+	if (this->valid(latura)) {
+		this->stanga_jos = sj;
+		this->latura = latura;
+	}
+	else {
+		cout << "\nEroare constructor patrat";
+		exit(EXIT_FAILURE);
+	}
+}
+Patrat::Patrat(const Patrat& p) {
+	this->stanga_jos = p.stanga_jos;
+	this->latura = p.latura;
+}
+Patrat& Patrat::operator=(const Patrat& p) {
+	this->stanga_jos = p.stanga_jos;
+	this->latura = p.latura;
+	return *this;
+}
+
+void Patrat::citire(istream &in) {
+	Punct sj;
+	cout << "\nCoordonate punct stanga jos: ";
+	in >> sj;
+	this->stanga_jos = sj;
+	float lat;
+	cout << "\nLungime latura:";
+	in >> lat;
+	if (this->valid(lat))
+		this->latura = lat;
+	else
+	{
+		cout << "\nEroare citire patrat";
+	}
+}
+
+void Patrat::afisare(ostream& out) {
+	cout << "\nCoordonate punct stanga jos:";
+	out << this->stanga_jos;
+	cout << "\nLungime latura:";
+	out << this->latura;
+}
+
+istream& operator>>(istream& in, Patrat& p) {
+	p.citire(in);
+	return in;
+}
+
+ostream& operator<<(ostream& out, Patrat& p) {
+	p.afisare(out);
+	return out;
+}
+
+Patrat::~Patrat() {
+}
+
+float Patrat::arie() {
+	cout << "\nAria patrat: ";
+	return latura*latura;
+}
+float Patrat::perimetru() {
+	cout << "\nPerimetru patrat: ";
+	return 4 * latura;
+}
+
+
+
+///=========================================================
+class Dreptunghi :virtual public Patrat {
+protected:
+	float latura2;
+public:
+	Dreptunghi();
+	Dreptunghi(Punct, float, float);
+	Dreptunghi(const Dreptunghi&);
+	Dreptunghi& operator=(const Dreptunghi&);
+	~Dreptunghi();
+	virtual void citire(istream &in);
+	virtual void afisare(ostream &out);
+	friend istream& operator>>(istream&, Dreptunghi&);
+	friend ostream& operator<<(ostream&, Dreptunghi&);
+	virtual float arie();
+	virtual float perimetru();
+	bool valid(float, float);
+};
+
+bool Dreptunghi::valid(float latura2, float latura) {
+	if (latura2 == latura) {
+		cout << "\nVerificare dreptunghhi: Figura nu a fost specificata corect";
+		exit(EXIT_FAILURE);
+	}
+	else return 1;
+}
+
+Dreptunghi::Dreptunghi() :Patrat() {
+	this->latura2 = 0;
+}
+
+Dreptunghi::Dreptunghi(Punct stanga_jos, float latura, float latura2) : Patrat(stanga_jos, latura) {
+	if (this->valid(latura, latura2))
+		this->latura2 = latura2;
+	else
+	{
+		cout << "\nEroare constructor dreptunghi";
+	}
+
+}
+
+Dreptunghi::Dreptunghi(const Dreptunghi& d) :Patrat(d) {
+	this->latura2 = d.latura2;
+}
+
+Dreptunghi& Dreptunghi::operator=(const Dreptunghi& d) {
+	Patrat::operator=(d);
+	this->latura2 = d.latura2;
+	return *this;
+}
+
+void Dreptunghi::citire(istream &in) {
+	Patrat::citire(in);
+	float lat;
+	cout << "\nLungime latura2:";
+	in >> lat;
+	if (this->valid(latura, latura2))
+		this->latura2 = lat;
+	else {
+		cout << "\nEroare citire dreptunghi";
+	}
+}
+
+void Dreptunghi::afisare(ostream &out) {
+	Patrat::afisare(out);
+	cout << "\nLungime latura2:";
+	out << this->latura2;
+}
+
+istream& operator>>(istream& in, Dreptunghi& d) {
+	d.citire(in);
+	return in;
+}
+
+ostream& operator<<(ostream& out, Dreptunghi& d) {
+	d.afisare(out);
+	return out;
+}
+Dreptunghi::~Dreptunghi() {
+}
+
+
+float Dreptunghi::arie() {
+	cout << "\nArie dreptunghi:";
+	return latura2*latura;
+}
+
+float Dreptunghi::perimetru() {
+	cout << "\nPerimetru dreptunghi:";
+	return 2 * latura + 2 * latura2;
+}
+
+
+
+/////=========================================================================
+class Romb :virtual public Patrat {
+protected:
+	Punct colt_opus;
+public:
+	Romb();
+	Romb(Punct, float, Punct);
+	Romb(const Romb&);
+	Romb& operator=(const Romb&);
+	~Romb();
+	virtual void citire(istream &in);
+	virtual void afisare(ostream &out);
+	friend istream& operator>>(istream&, Romb&);
+	friend ostream& operator<<(ostream&, Romb&);
+	virtual float arie();
+	virtual float perimetru();
+	bool valid(Punct, float, Punct);
+};
+
+bool Romb::valid(Punct stanga_jos, float latura, Punct colt_opus) {
+	//calculez coord punctelor stanga sus si dreapta jos 
+	float absss = colt_opus.getx() - latura;
+	float ordss = colt_opus.gety();
+	//cout<< absss << ordss <<endl;
+	float absdj = stanga_jos.getx() + latura;
+	float orddj = colt_opus.gety();
+	//cout<<absdj<<orddj<<endl;
+
+	//calculez directia dreptelor neparalele cu ox 
+	float dir1a = absss - stanga_jos.getx();
+	float dir1b = ordss - stanga_jos.gety();
+	float dir2a = colt_opus.getx() - absdj;
+	float dir2b = colt_opus.gety() - orddj;
+
+	float lat1 = sqrt(pow(dir1a, 2) + pow(dir1b, 2));
+	//cout<<lat1;
+	float lat2 = sqrt(pow(dir2a, 2) + pow(dir2b, 2));
+	//cout<<lat2;
+ 
+	if (dir1a == dir2a && dir1b == dir2b && lat1 == lat2)
+		return 1;
+	else
+	{
+		cout << "\nVerificare romb: Figura nu a fost specificata corect";
+		return 0;
+	}
+
+
+}
+
+
+Romb::Romb() :Patrat() {
+	this->colt_opus.setx(0);
+	this->colt_opus.sety(0);
+}
+
+Romb::Romb(Punct stanga_jos, float latura, Punct colt_opus) : Patrat(stanga_jos, latura) {
+	if (this->valid(stanga_jos, latura, colt_opus))
+		this->colt_opus = colt_opus;
+	else {
+		cout << "\nEroare constructor romb";
+	}
+
+}
+
+Romb::Romb(const Romb& r) :Patrat(r) {
+	this->colt_opus = r.colt_opus;
+}
+
+Romb& Romb::operator=(const Romb& r) {
+	Patrat::operator=(r);
+	this->colt_opus = r.colt_opus;
+	return *this;
+}
+
+void Romb::citire(istream &in) {
+	Patrat::citire(in);
+	Punct colt;
+	cout << "\nCoordonate colt opus: ";
+	in >> colt;
+	if (valid(stanga_jos, latura, colt_opus))
+		this->colt_opus = colt;
+	else
+		cout << "\nEroare citire romb";
+
+
+}
+
+void Romb::afisare(ostream &out) {
+	Patrat::afisare(out);
+	cout << "\nCoordonate colt opus: ";
+	out << this->colt_opus;
+}
+
+istream& operator>>(istream& in, Romb& r) {
+	r.citire(in);
+	return in;
+}
+
+ostream& operator<<(ostream& out, Romb& r) {
+	r.afisare(out);
+	return out;
+}
+
+
+Romb::~Romb() {
+}
+
+
+float Romb::arie() {
+	cout << "Arie romb:";
+	float d1 = sqrt(pow((stanga_jos.getx() - colt_opus.getx()), 2) + pow((stanga_jos.gety() - colt_opus.gety()), 2));
+	float absp2 = stanga_jos.getx() + latura;
+	float ordp2 = stanga_jos.gety();
+	float absp3 = colt_opus.getx() - latura;
+	float ordp3 = colt_opus.gety();
+	float d2 = sqrt(pow((absp2 - absp3), 2) + pow((ordp2 - ordp3), 2));
+	float arie = (d1*d2) / 2;
+	return arie;
+}
+float Romb::perimetru() {
+	cout << "\nPerimetru romb:";
+	return  4 * latura;
+}
+
+
+
+///////====================================================
+class Paralelogram :public Dreptunghi, public Romb {
+public:
+	Paralelogram();
+	Paralelogram(Punct, float, float, Punct);
+	Paralelogram(const Paralelogram&);
+	Paralelogram& operator=(const Paralelogram&);
+	~Paralelogram();
+	virtual void citire(istream &in);
+	virtual void afisare(ostream &out);
+	friend istream& operator>>(istream&, Paralelogram&);
+	friend ostream& operator<<(ostream&, Paralelogram&);
+	virtual float arie();
+	virtual float perimetru();
+	//bool valid();
+};
+
+
+Paralelogram::Paralelogram() :Dreptunghi(), Romb() {
+
+}
+
+Paralelogram::Paralelogram(Punct stanga_jos, float latura, float latura2, Punct colt_opus) : Patrat(stanga_jos, latura), Dreptunghi{ stanga_jos,latura, latura2 },
+Romb{ stanga_jos, latura, colt_opus } {
+
+}
+
+Paralelogram::Paralelogram(const Paralelogram& p) : Patrat(p), Dreptunghi(p), Romb(p) {
+
+}
+
+Paralelogram& Paralelogram::operator=(const Paralelogram& p) {
+	Dreptunghi::operator=(p);
+	Romb::operator=(p);
+	Patrat::operator=(p);
+	return *this;
+}
+
+void Paralelogram::citire(istream &in) {
+	cout << "\nLungime latura 1 ( || OX ): ";
+	in >> latura;
+	cout << "\nLungime latura2 ( NE|| OX ): ";
+	in >> latura2;
+	cout << "\nCoordonate punct stanga jos: ";
+	in >> stanga_jos;
+	cout << "\nCoordonate colt opus: ";
+	in >> colt_opus;
+
+}
+
+void Paralelogram::afisare(ostream &out) {
+	out << "\nLungime latura 1 ( || OX ): ";
+	out << latura;
+	out << "\nLungime latura2 ( NE|| OX ): ";
+	out << latura2;
+	out << "\nCoordonate punct stanga jos: ";
+	out << stanga_jos;
+	cout << "\nCoordonate colt opus: ";
+	out << colt_opus;
+
+}
+
+istream& operator>>(istream& in, Paralelogram& p) {
+	p.citire(in);
+	return in;
+}
+
+ostream& operator<<(ostream& out, Paralelogram& p) {
+	p.afisare(out);
+	return out;
+}
+Paralelogram::~Paralelogram() {
+}
+
+
+float Paralelogram::perimetru() {
+	cout << "Perimetru paralelogram:";
+	return  2 * latura2 + 2 * latura;
+}
+float Paralelogram::arie() {
+	float triunghi = 0;
+	float d = sqrt(pow((stanga_jos.getx() - colt_opus.getx()), 2) + pow((stanga_jos.gety() - colt_opus.gety()), 2));
+	float p = (latura + latura2 + d) / 2;
+	triunghi = sqrt(p*(p - latura2)*(p - latura)*(p - d));
+	float arie = 2 * triunghi;
+	cout << "Arie paralelogram:";
+	return arie;
+}
+
+
+
+////=========================================================
+class Trapez :public Paralelogram {
+	float baza2;
+public:
+	Trapez();
+	Trapez(Punct, float, float, Punct, float);
+	Trapez(const Trapez& p);
+	Trapez& operator=(const Trapez& x);
+	virtual ~Trapez(); ///destructor virtual
+	void citire(istream &in);
+	void afisare(ostream &out);
+	friend istream& operator>>(istream&, Trapez&);
+	friend ostream& operator<<(ostream&, Trapez&);
+	float arie();
+	float perimetru();
+	//bool valid();
+};
+
+
+Trapez::Trapez() :Paralelogram() {
+	this->baza2 = 0;
+}
+
+Trapez::Trapez(Punct stanga_jos, float latura, float latura2, Punct colt_opus, float baza2) : Paralelogram(stanga_jos, latura, latura2, colt_opus) {
+	this->baza2 = baza2;
+}
+
+Trapez::Trapez(const Trapez& t) : Patrat(t), Paralelogram(t) {
+	this->baza2 = t.baza2;
+
+}
+
+Trapez& Trapez::operator=(const Trapez& t) {
+	Paralelogram::operator=(t);
+	this->baza2 = t.baza2;
+	return *this;
+
+}
+
+void Trapez::citire(istream &in) {
+	float baz1;
+	cout << "\nLungme baza mare:";
+	in >> baz1;
+	this->latura = baz1;
+	float baz2;
+	cout << "\nLungime baza mica: ";
+	in >> baz2;
+	this->baza2 = baz2;
+	float lat;
+	cout << "\nLungime latura ramasa: ";
+	in >> lat;
+	this->latura2 = lat;
+}
+
+void Trapez::afisare(ostream &out) {
+	out << "\nLungime baza mare: ";
+	out << this->latura;
+	out << "\nLungime baza mica: ";
+	out << this->baza2;
+	out << "\nLungime latura ramasa: ";
+	out << this->latura2;
+}
+
+istream& operator>>(istream& in, Trapez& t) {
+	t.citire(in);
+	return in;
+}
+
+ostream& operator<<(ostream& out, Trapez& t) {
+	t.afisare(out);
+	return out;
+}
+Trapez::~Trapez() {
+}
+float Trapez::perimetru() {
+	float p = 2 * latura2 + latura + baza2;
+	cout << "Perimetru trapez:";
+	return p;
+}
+float Trapez::arie() {
+	cout << "Arie trapez: ";
+	float p = (2 * latura2 + latura + baza2) / 2;
+
+	float absss = colt_opus.getx() - latura;
+	float ordss = colt_opus.gety();
+
+	float absdj = stanga_jos.getx() + latura;
+	float orddj = colt_opus.gety();
+
+	float dr1 = absss - absdj;
+	float dr2 = ordss - orddj;
+
+	float d1 = sqrt(pow((stanga_jos.getx() - colt_opus.getx()), 2) + pow((stanga_jos.gety() - colt_opus.gety()), 2));
+	float d2 = sqrt(pow(dr1, 2) + pow(dr2, 2));
+	float tr1 = sqrt(p*(p - d2)*(p - latura2)*(p - baza2));
+	float tr2 = sqrt(p*(p - d1)*(p - latura)*(p - latura2));
+	float aria = tr1 + tr2;
+	return aria;
+
+}
+
+//////======================================================================
+void tip(Patrat *&p, int &i) {
+	string s;
+	cout << "\n";
+	cout << "Ce doriti sa cititi pentru figura  " << i + 1 << "? ";
+	cin >> s;
+	cout << "===============================\n";
+
+	try {
+		if (s == "patrat") {
+			p = new Patrat;
+			cin >> *p;
+			i++;
+		}
+		else if (s == "dreptunghi") {
+			p = new Dreptunghi;
+			cin >> *p;
+			i++;
+		}
+		else if (s == "romb") {
+			p = new Romb;
+			cin >> *p;
+			i++;
+		}
+		else if (s == "paralelogram") {
+			p = new Paralelogram;
+			cin >> *p;
+			i++;
+		}
+		else if (s == "trapez") {
+			p = new Trapez;
+			cin >> *p;
+			i++;
+		}
+		else
+			throw 10;
+	}
+	catch (bad_alloc var) {
+		cout << "Eroare de alocare\n";
+		exit(EXIT_FAILURE);
+	}
+	catch (int j) {
+		cout << "Invalid. Incercati patrat, dreptunghi, romb, paralelogram sau trapez.\n ";
+	}
+}
+
+void menu_output()
+{
+	cout << "\n Naiboiu Teodor Grupa 212 - Tema 5 \n";
+	cout << "\n\t MENIU:";
+	cout << "\n===========================================\n";
+	cout << "\n";
+	cout << "1. Citire figuri geometrice - upcast " << "\n";
+	cout << "2. Afisare figuri geometrice" << "\n";
+	cout << "3. Calculare perimetru" << "\n";
+	cout << "4. Calculare arie" << "\n";
+	cout << "5. Downcast" << "\n";
+	cout << "6. Afisare nr de figuri geometrice declarate\n";
+	cout << "0. Iesire." << "\n";
+}
+
+void menu()
+{
+	int n;
+	int option;
+	option = 0;
+	Patrat **p;
+	Trapez *d = (Trapez*)new Paralelogram; // exemplu downcast 
+	do
+	{
+		menu_output();
+
+		cout << "\nIntroduceti numarul actiunii: ";
+		cin >> option;
+
+		if (option == 1)
+		{
+			cout << "Introduceti numarul de figuri geometrice: ";
+			cin >> n;
+			try {
+				p = new Patrat*[n];
+				Patrat::nrfiguri();
+				for (int i = 0; i<n;)
+					tip(p[i], i);
+			}
+			catch (bad_alloc var) {
+				cout << "Eroare de alocare\n";
+				exit(EXIT_FAILURE);
+			}
+		}
+		if (option == 2)
+		{
+			cout << "\nAfisam figurile citite anterior:\n";
+			for (int i = 0; i<n; i++) {
+				cout << "\n" << *p[i];
+				cout << "\n=============================\n";
+			}
+		}
+		if (option == 3)
+		{
+			cout << "\nPerimetrele figurilor citite anterior: ";
+			for (int i = 0; i<n; i++) {
+				cout << "\nFigura " << i + 1 << ": ";
+				cout << p[i]->perimetru();
+			}
+		}
+		if (option == 4)
+		{
+			cout << "\nAriile figurilor citite anterior: ";
+			for (int i = 0; i<n; i++) {
+				cout << "\nFigura " << i + 1 << ": ";
+				cout << p[i]->arie();
+			}
+		}
+		if (option == 5)
+		{
+			cout << "Downcast\n";
+			cin >> *d;
+			cout << "--------------------------\n";
+			cout << *d;
+		}
+		if (option == 6)
+		{
+			cout << "Numarul de figuri geometrice declarate: ";
+			Patrat::nrfiguri();
+		}
+		if (option == 0)
+		{
+			cout << "\nEXIT!\n";
+		}
+		if (option<0 || option>6)
+		{
+			cout << "\nSelectie invalida\n";
+		}
+		cout << "\n";
+		system("pause");
+		system("cls");
+	} while (option != 0);
+}
+
+int main()
+{
+	menu();
+	return 0;
+}
