@@ -1,0 +1,968 @@
+#include<bits/stdc++.h>
+
+using namespace std;
+
+
+///////////////////============Clasa Baza
+class Animale {
+protected:
+	string nume;
+	string tip;///rapitor/nerapitor/erbivor/carnivor
+	int marime;
+	static int nr;
+	int ind;
+public:
+	Animale(string s = "", string t = "", int m = 0) {
+		nr++;
+		this->ind = nr;
+		this->nume = s;
+		try {
+			if (t != "Rapitor" || t != "Nerapitor" || t != "Erbivor" || t != "Carnivor") {
+				throw 10;
+			}
+		}
+		catch (int j) {
+			cout << "\nEroare constructor. Incercati unul dintre cele patru tipuri (Rapitor, Nerapitor, Erbivor, Carnivor) scrise cu majuscula.";
+			exit(EXIT_FAILURE);
+		}
+		this->tip = t;
+		try {
+			if (m<0)
+				throw 10;
+		}
+		catch (int i) {
+			cout << "\nEroare constructor. Marimea nu poate fi negativa.";
+			exit(EXIT_FAILURE);
+		}
+		this->marime = m;
+	}
+
+	Animale(const Animale& p) {
+		nr++;
+		this->ind = p.ind;
+		this->nume = p.nume;
+		this->tip = p.tip;
+		this->marime = p.marime;
+	}
+
+	virtual void citire(istream &in) {
+		string num, type;
+		int saiz;
+		cout << "\nDati numele animalului: ";
+		getline(in, num);
+		this->nume = num;
+		cout << "\nDati tipul animalului (Rapitor,Nerapitor, Erbivor, Carnivor): ";
+		getline(in, type);
+		try {
+			if (type != "Rapitor" || type != "Nerapitor" || type != "Erbivor" || type != "Carnivor") {
+				throw 10;
+			}
+		}
+		catch (int j) {
+			cout << "\nEroare citire. Incercati unul dintre cele patru tipuri (Rapitor, Nerapitor, Erbivor, Carnivor) scrise cu majuscula.";
+			exit(EXIT_FAILURE);
+		}
+		this->tip = type;
+		cout << "\nDati marimea animalului(numar natural >0)(cm): ";
+		in >> saiz;
+		try {
+			if (saiz<0)
+				throw 10;
+		}
+		catch (int i) {
+			cout << "\nEroare citire. Marimea nu poate fi negativa.";
+			exit(EXIT_FAILURE);
+		}
+		this->marime = saiz;
+	}
+
+	virtual void afisare(ostream &out) {
+		out << "\nAnimalul: ";
+		out << this->nume;
+		out << " este de tipul: " << this->tip << " si are marimea de: " << this->marime << " cm.";
+	}
+
+
+	friend	istream& operator >> (istream& in, Animale& x) {
+		x.citire(in);
+		return in;
+	}
+
+	friend ostream& operator << (ostream& out, Animale& x) {
+		x.afisare(out);
+		return out;
+	}
+
+	Animale& operator=(const Animale& p) {
+		if (this != &p) {
+			this->ind = p.ind;
+			this->nume = p.nume;
+			this->tip = p.tip;
+			this->marime = p.marime;
+		}
+		return *this;
+	}
+
+	void set_nume(string s){
+		this->nume = s;
+	}
+
+	string get_nume() const {
+		return this->nume;
+	}
+
+	string get_tip() const {
+		return this->tip;
+	}
+
+	int get_marime() const {
+		return this->marime;
+	}
+
+	~Animale() { nr--;}
+
+	static void nranimale() {
+		cout << nr;
+	}
+};
+
+int Animale::nr;
+
+////////////////================Clasa Nevertebrate
+class Nevertebrate :public Animale {
+	bool exo; //daca au exoschelet sau nu
+public:
+	Nevertebrate(string s = "", string t = "", int m = 0, bool ex = 0) :Animale(s, t, m) {
+		try {
+			if (ex == 1 || ex == 0)
+				this->exo = ex;
+			else
+				throw 10;
+		}
+		catch (int j) {
+			cout << "\nEroare constructor. Exoscheletul poate fi semnalat doar prin 0 sau 1.";
+			exit(EXIT_FAILURE);
+		}
+	}
+
+	Nevertebrate(const Nevertebrate& p) :Animale(p) {
+		this->exo = p.exo;
+	}
+
+	Nevertebrate& operator=(const Nevertebrate& p) {
+		Animale::operator=(p);
+		if (this != &p)
+			this->exo = p.exo;
+		return *this;
+	}
+
+	void citire(istream &in) {
+		bool exoo;
+		Animale::citire(in);
+		cout << "\nPrecizati daca are exoschelet(1) sau nu(0).";
+		in >> exoo;
+		try {
+			if (exoo == 1 || exoo == 0)
+				this->exo = exoo;
+			else
+				throw 10;
+		}
+		catch (int j) {
+			cout << "\nEroare citire. Exoscheletul poate fi semnalat doar prin 0 sau 1.";
+			exit(EXIT_FAILURE);
+		}
+		this->exo = exoo;
+	}
+	void afisare(ostream &out) {
+		Animale::afisare(out);
+		if (this->exo == 1)
+			out << "\nAnimalul are exoschelet.";
+		else
+			if (this->exo == 0)
+				out << "\nAnimalul nu are exoschelet.";
+	}
+	// friend istream& operator >> (istream&, Nevertebrate& x) {
+	// 	x.citire(in);
+	// 	return in;
+	// }
+	// friend ostream& operator << (ostream&, Nevertebrate& x) {
+	// 	x.afisare(out);
+	// 	return out;
+	// }
+
+	~Nevertebrate() {};
+
+};
+
+/////////////////////=======================Clasa Vertebrate
+class Vertebrate :public Animale {
+	int agresivitate;///pe o scara de la 0-10 cat de agresiv e animalul...
+public:
+	Vertebrate(string s = "", string t = "", int m = 0, int agre = 0) :Animale(s, t, m) {
+		try {
+			if (agre >= 0 && agre <= 10)
+				this->agresivitate = agre;
+			else
+				throw 10;
+		}
+		catch (int i) {
+			cout << "\nEroare constructor. Nivelul de agresivitate nu poate fi inafara intervalului [0,10]";
+			exit(EXIT_FAILURE);
+		}
+	}
+
+	Vertebrate(const Vertebrate& p) :Animale(p) {
+		this->agresivitate = p.agresivitate;
+	}
+
+	Vertebrate& operator=(const Vertebrate& p) {
+		Animale::operator=(p);
+		if (this != &p)
+			this->agresivitate = p.agresivitate;
+		return *this;
+	}
+
+	void citire(istream &in) {
+		int agr;
+		Animale::citire(in);
+		cout << "\nPe o scara de la 0 la 10 precizati cat de agresiv este animalul: ";
+		in >> agr;
+		try {
+			if (agr >= 0 && agr <= 10)
+				this->agresivitate = agr;
+			else
+				throw 10;
+		}
+		catch (int i) {
+			cout << "\nEroare citire. Nivelul de agresivitate nu poate fi inafara intervalului [0,10]";
+			exit(EXIT_FAILURE);
+		}
+	}
+	void afisare(ostream &out) {
+		Animale::afisare(out);
+		out << "\nAgresivitate: " << this->agresivitate << "/10";
+	}
+	// friend istream& operator >> (istream&, Vertebrate& x) {
+	// 	x.citire(in);
+	// 	return in;
+	// }
+	// friend ostream& operator << (ostream&, Vertebrate& x) {
+	// 	x.afisare(out);
+	// 	return out;
+	// }
+
+	~Vertebrate() {};
+
+};
+
+///////////////////////////=====================Clasa Pesti
+class Pesti :public Vertebrate {
+	int adancime;///adancimea la care traieste pestele;
+public:
+	Pesti(string s = "", string t = "", int m = 0, int adanc = 0) :Vertebrate(s, t, m) {
+		try {
+			if (adanc<0)
+				throw adanc;
+		}
+		catch (float x) {
+			cout << "\nEroare constructor. Adancimea nu poate fi negativa.";
+			exit(EXIT_FAILURE);
+		}
+		this->adancime = adanc;
+	}
+
+	Pesti(const Pesti& p) :Vertebrate(p) {
+		this->adancime = p.adancime;
+	}
+
+	Pesti& operator=(const Pesti& p) {
+		Vertebrate::operator=(p);
+		if (this != &p)
+			this->adancime = p.adancime;
+		return *this;
+	}
+
+	void citire(istream &in) {
+		int adanci;
+		Vertebrate::citire(in);
+		cout << "\nPrecizati adancimea la care traieste pestele (m).";
+		in >> adanci;
+		try {
+			if (adanci<0)
+				throw adanci;
+		}
+		catch (float x) {
+			cout << "Eroare citire. Adancimea nu poate fi negativa.";
+			exit(EXIT_FAILURE);
+		}
+		this->adancime = adanci;
+
+	}
+	void afisare(ostream &out) {
+		Vertebrate::afisare(out);
+		out << "\nAdancimea in apa: " << this->adancime;
+	}
+	// friend istream& operator >> (istream&, Pesti& x) {
+	// 	x.citire(in);
+	// 	return in;
+	// }
+	// friend ostream& operator << (ostream&, Pesti& x) {
+	// 	x.afisare(out);
+	// 	return out;
+	// }
+	bool PM(){
+		if(this->tip == "Rapitor" && this->marime >= 100){
+			return 1;
+		}
+		return 0;
+	}
+	~Pesti() {};
+};
+
+////////////////////////////==================Clasa Reptile
+class Reptile :public Vertebrate {
+	string zona;
+public:
+	Reptile(string s = "", string t = "", int m = 0, string z = "") :Vertebrate(s, t, m) {
+		this->zona = z;
+	}
+
+	Reptile(const Reptile& p) :Vertebrate(p) {
+		this->zona = p.zona;
+	}
+
+	Reptile& operator=(const Reptile& p) {
+		Vertebrate::operator=(p);
+		if (this != &p)
+			this->zona = p.zona;
+		return *this;
+	}
+
+	void citire(istream &in) {
+		string s;
+		Vertebrate::citire(in);
+		cout << "\nIntroduceti zona de origine a reptilei: ";
+		getline(in, s);
+		this->zona = s;
+	}
+	void afisare(ostream &out) {
+		Vertebrate::afisare(out);
+		out << "\nZona de origine este: ";
+		out << this->zona;
+	}
+	// friend istream& operator >> (istream&, Reptile& x) {
+	// 	x.citire(in);
+	// 	return in;
+	// }
+	// friend ostream& operator << (ostream&, Reptile& x) {
+	// 	x.afisare(out);
+	// 	return out;
+	// }
+
+	~Reptile() {};
+};
+
+//////////////////////==========================Clasa Mamifere
+class Mamifere :public Vertebrate {
+	string mediu;///mediul de viata (acvatic, terestru, subteran,aerian)
+public:
+	Mamifere(string s = "", string t = "", int m = 0, string med = "") :Vertebrate(s, t, m) {
+		try {
+			if (med == "Acvatic" || med == "Terestru" || med == "Subteran" || med == "Aerian")
+				this->mediu = med;
+			else
+				throw 1;
+		}
+		catch (int i) {
+			cout << "\nEroare constructor. Mediul de viata nu poate fi altceva inafara de cele patru mentionate (Acvatic, Terestru, Subteran, Aerian).";
+			exit(EXIT_FAILURE);
+		}
+	}
+
+	Mamifere(const Mamifere& p) :Vertebrate(p) {
+		this->mediu = p.mediu;
+	}
+
+	Mamifere& operator=(const Mamifere& p) {
+		Vertebrate::operator=(p);
+		if (this != &p)
+			this->mediu = p.mediu;
+		return *this;
+	}
+
+	void citire(istream &in) {
+		string med;
+		Vertebrate::citire(in);
+		cout << "\nIntroduceti mediul de viata (Acvatic,Terestru,Subteran,Aerian): ";
+		getline(in, med);
+		try {
+			if (med == "Acvatic" || med == "Terestru" || med == "Subteran" || med == "Aerian")
+				this->mediu = med;
+			else
+				throw 1;
+		}
+		catch (int i) {
+			cout << "\nEroare citire. Mediul de viata nu poate fi altceva inafara de cele patru mentionate (Acvatic, Terestru, Subteran, Aerian).";
+			exit(EXIT_FAILURE);
+		}
+	}
+	void afisare(ostream &out) {
+		Vertebrate::afisare(out);
+		out << "\nMediul de viata: " << this->mediu;
+	}
+	// friend istream& operator >> (istream&, Mamifere& x) {
+	// 	x.citire(in);
+	// 	return in;
+	// }
+	// friend ostream& operator << (ostream&, Mamifere& x) {
+	// 	x.afisare(out);
+	// 	return out;
+	// }
+
+	~Mamifere() {};
+};
+/////////////////===============Clasa Pasari
+class Pasari :public Vertebrate {
+	char zona_activitate;//zboara sau nu zboara (ex strut,gaina,rata domestica)
+	char scop;//domestice(pt carne/oua) sau salbatice
+public:
+	Pasari(string s = "", string t = "", int m = 0, char za = '\0', char sc = '\0') :Vertebrate(s, t, m) {
+		try {
+			if (za == 'D' || za == 'N')
+				this->zona_activitate = za;
+			else
+				throw 1;
+		}
+		catch (int i) {
+			cout << "\nEroare constructor. Precizati cu D (Da) sau N (Nu) daca pasarea zboara sau nu.";
+			exit(EXIT_FAILURE);
+		}
+		try {
+			if (sc == 'D' || sc == 'S')
+				this->scop = sc;
+			else
+				throw 1;
+		}
+		catch (int i) {
+			cout << "\nEroare constructor. Precizati cu D (Domestic) daca pasarea este domestica sau cu S (Salbatica) daca pasarea este salbatica.";
+			exit(EXIT_FAILURE);
+		}
+	}
+
+	Pasari(const Pasari& p) :Vertebrate(p) {
+		this->zona_activitate = p.zona_activitate;
+		this->scop = p.scop;
+	}
+
+	Pasari& operator=(const Pasari& p) {
+		if (this != &p) {
+			Vertebrate::operator=(p);
+			this->zona_activitate = p.zona_activitate;
+			this->scop = p.scop;
+		}
+		return *this;
+	}
+
+	void citire(istream &in) {
+		char z;
+		char s;
+		Vertebrate::citire(in);
+		cout << "\nDaca pasarea zboara introduceti D. Daca pasarea nu zboara introduceti N.";
+		in >> z;
+		try {
+			if (z == 'D' || z == 'N')
+				this->zona_activitate = z;
+			else
+				throw 1;
+		}
+		catch (int i) {
+			cout << "\nEroare citire. Precizati cu D (Da) sau N (Nu) daca pasarea zboara sau nu.";
+			exit(EXIT_FAILURE);
+		}
+		cout << "\nSpecificati daca pasarea este salbatica sau domestica(de curte)(introduceti S pentru salbatica sau D pentru domestica).";
+		in >> s;
+		try {
+			if (s == 'D' || s == 'S')
+				this->scop = s;
+			else
+				throw 1;
+		}
+		catch (int i) {
+			cout << "\nEroare citire. Precizati cu D (Domestic) daca pasarea este domestica sau cu S (Salbatica) daca pasarea este salbatica.";
+			exit(EXIT_FAILURE);
+		}
+	}
+	void afisare(ostream &out) {
+		Vertebrate::afisare(out);
+		if (this->zona_activitate == 'D')
+			out << "\nPasarea zboara.";
+		else
+			if (this->zona_activitate == 'N')
+				out << "\nPasarea nu zboara.";
+		if (this->scop == 'S')
+			out << "\nPasarea este salbatica.";
+		else
+			if (this->scop == 'D')
+				out << "\nPasarea este domestica.";
+	}
+	// friend istream& operator >> (istream&, Pasari& x) {
+	// 	x.citire(in);
+	// 	return in;
+	// }
+	// friend ostream& operator << (ostream&, Pasari& x) {
+	// 	x.afisare(out);
+	// 	return out;
+	// }
+
+	~Pasari() {};
+};
+////////////============Template
+template <class t> class AtlasZoologic {
+
+	vector <t> zoo;
+	int nr;
+public:
+	AtlasZoologic(vector<t> z = {}, int n = 0)
+	{
+
+		this->nr = n;
+		if (n != 0) {
+			for (unsigned int i = 0; i<z.size(); i++){
+				this->zoo.push_back(z[i]);
+			}
+		}
+	}
+	AtlasZoologic(AtlasZoologic &a)
+	{
+		this->nr = a.nr;
+		for(unsigned int i=0;i<a.zoo.size();i++){
+            this->zoo.push_back(a.zoo[i]);
+        }
+		
+	}
+	~AtlasZoologic()
+	{    
+		zoo.clear();
+	}
+
+	AtlasZoologic& operator=(const AtlasZoologic& g){
+		if(this != &g){
+            zoo.clear();
+        	for(unsigned int i=0;i<g.zoo.size();i++){
+            	this->zoo.push_back(g.zoo[i]);
+        	}
+			this->nr = g.nr;
+		}
+		return *this;
+	}
+
+	AtlasZoologic& operator+=(t& l){
+
+      this->zoo.push_back(l);
+      this->nr++;
+      return *this;
+	}
+
+	friend istream& operator >>(istream &in, AtlasZoologic <t> &l)
+	{
+	
+	cout <<"Introduceti numarul de animale:";
+		in >> l.nr;
+		if (l.nr > 0){
+        	t a;
+       		for(int i=0;i<l.nr;i++){
+				cout<<"Animalul " << i+1 <<":\n";
+				in.get();
+            	in >> a;
+            	l.zoo.push_back(a);
+				cout<<"========================\n";
+       		}
+
+    	}
+    	else{
+        	cout<<"Numarul de animale trebuie sa fie pozitiv.";
+        	exit(EXIT_FAILURE);
+		}
+
+		return in;
+	}
+	friend ostream& operator <<(ostream &out, AtlasZoologic<t> &c)
+	{
+		out<<"Atlasul contine urmatoarele "<<c.nr<<" animale:"<<"\n";
+		for(int i=0;i<c.nr;i++){
+        	out << "Animalul " << i+1 << ":\n";
+        	out << c.zoo[i];
+			out << "===========================\n";
+		}
+
+		return out;
+	}
+};
+////////////////////////////////////////////////////////////////////////
+template <> class AtlasZoologic<Pesti> {
+	vector<Pesti> pesti;
+	int nr;
+	int nrPM;
+public:
+	AtlasZoologic(vector<Pesti> z = {}, int n = 0)
+	{
+		this->nrPM = 0;
+		this->nr = n;
+		if (n != 0) {
+			for (unsigned int i = 0; i<z.size(); i++){
+				this->pesti.push_back(z[i]);
+			}
+
+			for(unsigned int i =0; i<pesti.size(); i++){
+				if(pesti[i].PM()){
+					this->nrPM++;
+				}
+			}
+		}
+	}
+	AtlasZoologic(AtlasZoologic &a)
+	{
+		this->nr = a.nr;
+		for(unsigned int i=0;i<a.pesti.size();i++){
+            this->pesti.push_back(a.pesti[i]);
+        }
+		
+	}
+	~AtlasZoologic()
+	{    
+		pesti.clear();
+	}
+
+	AtlasZoologic& operator=(const AtlasZoologic& g){
+		if(this != &g){
+            pesti.clear();
+        	for(unsigned int i=0;i<g.pesti.size();i++){
+            	this->pesti.push_back(g.pesti[i]);
+        	}
+			this->nr = g.nr;
+		}
+		return *this;
+	}
+
+	AtlasZoologic& operator+=(Pesti& l){
+
+      this->pesti.push_back(l);
+      this->nr++;
+      return *this;
+	}
+
+	friend istream& operator >>(istream &in, AtlasZoologic <Pesti> &l)
+	{
+	
+	cout <<"Introduceti numarul de pesti:";
+		in >> l.nr;
+		if (l.nr > 0){
+        	Pesti a;
+       		for(int i=0;i<l.nr;i++){
+				cout<<"Pestele " << i+1 <<":\n";
+				in.get();
+            	in >> a;
+            	l.pesti.push_back(a);
+				cout<<"========================\n";
+       		}
+
+			for(unsigned int i =0; i< l.pesti.size(); i++){
+				if(l.pesti[i].PM()){
+					l.nrPM++;
+			
+				}
+			}
+
+    	}
+    	else{
+        	cout<<"Numarul de pesti trebuie sa fie pozitiv.";
+        	exit(EXIT_FAILURE);
+		}
+
+		return in;
+	}
+	friend ostream& operator <<(ostream &out, AtlasZoologic<Pesti> &c)
+	{
+		out<<"Atlasul contine urmatorii "<<c.nr<<" pesti:"<<"\n";
+		for(int i=0;i<c.nr;i++){
+        	out << "Animalul " << i+1 << ":\n";
+        	out << c.pesti[i];
+			out << "===========================\n";
+		}
+		out<<"Dintre care," << c.nrPM << "sunt rapitori de lungime >1 m";  
+
+		return out;
+	}	
+
+};
+
+////////////////////======================Functia Tip
+void tip(Animale *&p, int &i) {
+	string s;
+	cout << "\n";
+	cout << "Introduceti tipul animalului " << i + 1 << ": ";
+	getline(cin, s);
+	try
+	{
+		if (s == "Nevertebrate")
+		{
+			p = new Nevertebrate;
+			cin >> *p;
+			i++;
+		}
+		else
+			if (s == "Vertebrate")
+			{
+				cout << "\nIntroduceti tipul de vertebrata cu majuscula (Pesti, Reptile, Mamifere, Pasari)";
+				getline(cin, s);
+				if (s == "Pesti") {
+					p = new Pesti;
+					cin >> *p;
+					i++;
+				}
+				else
+					if (s == "Reptile") {
+						p = new Reptile;
+						cin >> *p;
+						i++;
+					}
+					else
+						if (s == "Mamifere") {
+							p = new Mamifere;
+							cin >> *p;
+							i++;
+						}
+						else
+							if (s == "Pasari") {
+								p = new Pasari;
+								cin >> *p;
+								i++;
+							}
+							else
+								throw 10;
+
+			}
+			else
+				throw 10;
+	}
+	catch (bad_alloc var)
+	{
+		cout << "Allocation Failure\n";
+		exit(EXIT_FAILURE);
+	}
+	catch (int j)
+	{
+		cout << "Nu ati introdus un tip valid. Incercati sa introduceti mai intai regnul apoi tipul specific.\n ";
+	}
+};
+///Optiune:citire n obiecte(in list<Animal* (upcast) in functia tip
+///optiune static numar obiecte
+///optiune template fiecare clasa
+///dinamic cast rtti de la el(firmadistributie)
+void menu_output(){
+
+        cout<<"\t\t\tNaiboiu Teodor - Grupa: 212 - Proiect: 2 "<<endl;
+        cout<<"\n\n\t\t\t\t\t\t\tMENIU\n\n";
+        cout<<"========================================================================================================================"<<endl;
+        cout<<"\n\t1.Citire si afisare animale.\n";
+        cout<<"\t2.Rtti - dynamic cast \n";
+        cout<<"\t3.Template<mamifere>\n";
+        cout<<"\t4.Template<pasari>\n";
+        cout<<"\t5.Template<pesti>\n";
+        cout<<"\t6.Adaugare aniamle in atlas\n";
+        cout<<"\t0.Iesire.\n\n";
+
+}
+
+
+void menu()
+{
+    int option;
+    option = 0;
+    int n=0;
+    list<Animale*> lista;
+	vector<Animale*> v;
+
+	AtlasZoologic<Reptile> x;
+	AtlasZoologic<Pesti> y;
+	AtlasZoologic<Pasari> q;
+	AtlasZoologic<Mamifere> o;
+
+    do
+    {
+        menu_output();
+        cout<<"\nIntroduceti numarul actiunii: ";
+        cin>>option;
+        if (option==1)
+        {
+            cout<<"Introduceti numarul de obiecte citite: ";
+            cin>>n;
+            string s;
+           
+            if (n>0)
+            {//pesti reptile mamifere pasari
+                for(int i=0;i<n;){
+                    v.push_back(new Animale);
+                    tip(v[i],i);
+					Animale *p;
+					int copieI;
+					if (i !=copieI){
+						Reptile *p1=dynamic_cast<Reptile*>(v[i]);
+						Pesti *p2=dynamic_cast<Pesti*>(v[i]);
+						Pasari *p3=dynamic_cast<Pasari*>(v[i]);
+						Mamifere *p4=dynamic_cast<Mamifere*>(v[i]);
+						if (p1)
+							lista.push_back(new Reptile(*p1));
+						if (p2)
+							lista.push_back(new Pesti(*p2));
+						if(p3)
+							lista.push_back(new Pasari(*p3));
+						if(p4)
+							lista.push_back(new Mamifere(*p4));	
+						cin.get();
+						i--;
+					}else {
+						//cin.get();
+					}
+
+					
+				}
+                    
+                cout<<"\nAfisam animalele citite anterior:\n";
+				for(int i = 0; i < n; i++){
+							cout<<"\nAnimalul " << i+1<<":\n";
+							cout<<"--------------------------\n";
+							cout << *v[i];
+							
+					}
+            
+            
+            }
+            else
+                cout<<"Numarul introdus trebuie sa fie pozitiv.\n";
+        }
+        if (option==2)
+        {
+
+            int N_r,N_p,N_pp,N_mm;
+            N_r=N_p=N_pp=N_mm=0;
+            if (n>0){
+            for(int i=0;i<n;i++)
+            {
+                
+                Reptile *p1=dynamic_cast<Reptile*>(v[i]);
+                Pesti *p2=dynamic_cast<Pesti*>(v[i]);
+				Pasari *p3=dynamic_cast<Pasari*>(v[i]);
+				Mamifere *p4=dynamic_cast<Mamifere*>(v[i]);
+   
+                if (p1)
+                    N_r++;
+                if (p2)
+                    N_p++;
+				if(p3)
+					N_pp++;
+				if(p4)
+					N_mm++;		
+        
+            }
+            cout<<"Numarul de reptile: "<<N_r<<"\n";
+            cout<<"Numarul de pesti: "<<N_p<<"\n";
+			cout<<"Numarul de pasari: "<<N_pp<<"\n";
+			cout<<"Numarul de mamifere: "<<N_mm<<"\n";
+            }
+            else{
+                cout<<"Nu s-au citit animale. Reveniti la actiunea 1.\n";
+            }
+           
+        }
+        if (option==3)
+        {
+            cin>>x;
+			cout<<x;
+        }
+        if (option==4)
+        {
+            cin>>y;
+            cout<<y;
+        }
+        if (option==5)
+        {   
+            cin>>q;
+            cout<<q;
+        }
+		if(option ==6){
+			cin>>o;
+			cout<<o;
+		}
+        if(option==7){
+            string a;
+            cout<<"Introduceti tipul animalului pe care vreti sa il adaugati in atlas: ";
+            cin>>a;
+            cin.get();
+            try
+            {
+                if(a=="reptila")
+                {
+                        Reptile r;
+                        cin>>r;
+                        x+=r;
+                        cout<<x;
+                        
+                }
+                else
+                    if(a=="peste")
+                    {
+                        Pesti p;
+                        cin>>p;
+                        y+=p;
+                        cout<<y;
+                        
+                    }
+                    else 
+						if(a =="pasare"){
+							Pasari pp;
+							cin>>pp;
+							q+= pp;
+							cout <<q;
+						}
+						else 
+							if(a == "mamifer"){
+								Mamifere m;
+								cin >> m;
+								o+=m;
+								cout<<o;
+							}
+							else
+                        		throw 10;
+            }
+ 
+            catch(int j)
+            {
+                cout<<"Nu ati introdus un tip valid. Incercati reptila,peste,pasare sau mamifer.\n ";
+            }
+        }
+        if (option==0)
+        {
+            cout<<"\nEXIT\n\n";
+        }
+        if (option<0||option>5)
+        {
+            cout<<"\nSelectie invalida\n";
+        }
+        cout<<"\n";
+        system("pause"); ///Pauza - Press any key to continue...
+        system("cls");   ///Sterge continutul curent al consolei
+    }
+    while(option!=0);
+    
+}
+
+
+
+int main()
+{
+	menu();
+
+	return 0;
+}
+
